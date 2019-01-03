@@ -1,0 +1,167 @@
+{%extends 'base_head.html'%}
+{%block title%}{{title}}{%endblock%}
+{%block title2%}购物车{%endblock%}
+{%block body%}
+
+	<div class="total_count">全部商品<em class='t_count'>{{num}}</em>件</div>	
+	<ul class="cart_list_th clearfix">
+		<li class="col01">商品名称</li>
+		<li class="col02">商品单位</li>
+		<li class="col03">商品价格</li>
+		<li class="col04">数量</li>
+		<li class="col05">小计</li>
+		<li class="col06">操作</li>
+	</ul>
+	{%for g in g_list%}
+	<ul class="cart_list_td clearfix" id={{g.id}}>
+		<li class="col01"><input type="checkbox" name="" checked='true' class='check_one'></li>
+		<li class="col02"><img src="/static/{{g.good.gpic}}"></li>
+		<li class="col03">{{g.good.gtitle}}<br><em></em></li>
+		<li class="col04">500g</li>
+		<li class="col05" price={{g.good.gprice}}>{{g.good.gprice}}元</li>
+		<li class="col06">
+			<div class="num_add">
+				<a href="javascript:;" class="add fl">+</a>
+				<input type="text" class="num_show fl" value={{g.count}}>	
+				<a href="javascript:;" class="minus fl">-</a>	
+			</div>
+		</li>
+		<li class="col07">25.80元</li>
+		<li class="col08"><a href="javascript:;">删除</a></li>
+	</ul>
+	{%endfor%}
+
+	<ul class="settlements">
+		<li class="col01"><input type="checkbox" name="" checked="" class='check_all'></li>
+		<li class="col02">全选</li>
+		<li class="col03">合计(不含运费)：<span>¥</span><em class='total_price'>42.60</em><br>共计<b class='total_num'>2</b>件商品</li>
+		<li class="col04"><a class='c9' href="place_order.html">去结算</a></li>
+	</ul>
+
+	<div class="footer">
+		<div class="foot_link">
+			<a href="#">关于我们</a>
+			<span>|</span>
+			<a href="#">联系我们</a>
+			<span>|</span>
+			<a href="#">招聘人才</a>
+			<span>|</span>
+			<a href="#">友情链接</a>		
+		</div>
+		<p>CopyRight © 2016 北京天天生鲜信息技术有限公司 All Rights Reserved</p>
+		<p>电话：010-****888    京ICP备*******8号</p>
+	</div>
+<script src='/static/js/jquery-1.12.4.min.js'></script>
+<script type='text/javascript'>
+	$(function(){
+		var para='/order/?cart_id=';
+		$(':checked:not(.check_all)').each(function(){
+			para=para+$(this).parent().parent().attr('id')+'_'
+		});
+		para=para.substring(0,para.length-1);
+		$('.c9').attr('href',para);
+		
+		
+	});
+	$('.check_all').click(function(){
+		state=$(this).prop('checked');
+		$(':checkbox').prop('checked',state);
+		total();
+		var para='/order/?cart_id='
+		$(':checked:not(.check_all)').each(function(){
+			para=para+$(this).parent().parent().attr('id')+'_'
+		});
+		para=para.substring(0,para.length-1);
+		$('.c9').attr('href',para)
+	
+	});
+	$(':checkbox:not(.check_all)').click(function(){
+		if($(this).prop('checked')){
+			if($(':checked').length+1==$(':checkbox').length){
+				$('.check_all').prop('checked',true)
+
+			}
+		}else{$('.check_all').prop('checked',false)
+
+		}
+		total();
+		var para='/order/?cart_id='
+		$(':checked:not(.check_all)').each(function(){
+			para=para+$(this).parent().parent().attr('id')+'_'
+		});
+		para=para.substring(0,para.length-1);
+		$('.c9').attr('href',para)
+		
+	});
+	function total(){
+		var total_price=0;
+		var total_count=0;
+		$('.col07').each(function(){
+			var summary=$(this).siblings().filter('.col05').attr('price')*$(this).prev().find('.num_show').val();
+			$(this).text(summary.toFixed(2)+'元');
+			if($(this).siblings().filter('.col01').children().prop('checked')){
+				total_price+=summary;
+				total_count++;
+			}
+		});
+		$('.total_price').text(total_price);
+		$('.total_num').text(total_count);
+		var l=$(':checkbox').length-1;
+		$('.t_count').text(l);
+
+
+
+	}
+	$(total());
+	$('.add').click(function(){
+		var c=Number($(this).next().val())+1;
+		$(this).next().val(c).blur();
+	
+	});
+	$('.minus').click(function(){
+		var c=Number($(this).prev().val());
+		if(c>1){
+			c--;
+			$(this).prev().val(c).blur();	
+
+		}
+	})
+	$('.num_show').blur(function(){
+		var c=$(this).val();
+		if(c>=1&& c%1==0){
+		total();
+		var cart_count=$(this).val();
+		var cart_id=$(this).parent().parent().parent().attr('id')
+		$.get('/cart/edit-'+cart_id+'-'+cart_count,function(data){
+
+			if(data.result==false){
+				alert('修改失败');
+			}
+		})
+	}
+
+	});
+	$('.col08').click(function(){
+		if(confirm('确认删除？')){
+		var cart_id=$(this).parent().attr('id');
+		$.get('/cart/delete-'+cart_id,function(data){
+		
+			if(data.result){
+				$('#'+cart_id).remove();
+				total();
+			}else{
+				alert('删除失败')
+			}
+
+		});
+		}	
+	})
+
+
+	
+
+</script>
+	
+</body>
+</html>
+{%endblock%}

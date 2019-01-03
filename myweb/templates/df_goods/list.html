@@ -1,0 +1,168 @@
+{% extends 'goods_base_head.html'%}
+{%block title%}{{title}}{%endblock title%}
+{%block body%}
+
+	<div class="search_bar clearfix">
+		<a href="/index" class="logo fl"><img src="/static/images/logo.png"></a>
+		<div class="search_con fl">
+			<form method='get' action='/search/' target='_blank'>
+				<input type="text" class="input_text fl" name="q" placeholder="搜索商品">
+				<input type="submit" class="input_btn fr" name="" value="搜索">
+			</form>
+		</div>
+		<div class="guest_cart fr">
+			<a href="/cart" class="cart_name fl">我的购物车</a>
+			<div class="goods_count fl"></div>
+		</div>
+	</div>
+
+	<div class="navbar_con">
+		<div class="navbar clearfix">
+			<div class="subnav_con fl">
+				<h1>全部商品分类</h1>	
+				<span></span>			
+				<ul class="subnav">
+					<li><a href="#" class="fruit">新鲜水果</a></li>
+					<li><a href="#" class="seafood">海鲜水产</a></li>
+					<li><a href="#" class="meet">猪牛羊肉</a></li>
+					<li><a href="#" class="egg">禽类蛋品</a></li>
+					<li><a href="#" class="vegetables">新鲜蔬菜</a></li>
+					<li><a href="#" class="ice">速冻食品</a></li>
+				</ul>
+			</div>
+			<ul class="navlist fl">
+				<li><a href="/index">首页</a></li>
+				<li class="interval">|</li>
+				<li><a href="">手机生鲜</a></li>
+				<li class="interval">|</li>
+				<li><a href="">抽奖</a></li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="breadcrumb">
+		<a href="/index">全部分类</a>
+		<span>></span>
+		<a href="">新鲜水果</a>
+	</div>
+
+	<div class="main_wrap clearfix">
+		<div class="l_wrap fl clearfix">
+			<div class="new_goods">
+				<h3>新品推荐</h3>
+				<ul>
+					{% for g in adv_list %}
+					<li>
+						<a href="/index/{{g.id}}"><img src="/static/{{g.gpic}}"></a>
+						<h4><a href="/index/{{g.id}}">{{g.gtitle}}</a></h4>
+						<div class="prize">￥{{g.gprice}}</div>
+					</li>
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+
+		<div class="r_wrap fr clearfix">
+			<div class="sort_bar" value={{sort}}>
+				<a href="/list/{{tid}}-1-1" class="active">默认</a>
+				<a href="/list/{{tid}}-2-1">价格</a>
+				<a href="/list/{{tid}}-3-1">人气</a>
+			</div>
+
+			<ul class="goods_type_list clearfix">
+				{% for g in g_list%}
+				<li>
+					<a href="/index/{{g.id}}"><img src="/static/{{g.gpic}}"></a>
+					<h4><a href="/index/{{g.id}}">{{g.gtitle}}</a></h4>
+					<div class="operate">
+						<span class="prize">￥{{g.gprice}}</span>
+						<span class="unit">500g</span>
+						<a href="/cart/add-{{g.id}}-1" class="add_goods" title="加入购物车"></a>
+					</div>
+				</li>
+				{% endfor %}
+
+				
+			
+			</ul>
+
+			<div class="pagenation" value1="/list/{{tid}}-{{sort}}-" value2={{pid}} num={{num}}>
+				<a class='p_up' href="#"><上一页</a>
+				{% for p in pages %}
+				<a href="/list/{{tid}}-{{sort}}-{{p}}" class="">{{p}}</a>
+				{% endfor %}
+				<a class='p_down' href="#">下一页></a>
+			</div>
+		</div>
+	</div>
+
+	<div class="footer">
+		<div class="foot_link">
+			<a href="#">关于我们</a>
+			<span>|</span>
+			<a href="#">联系我们</a>
+			<span>|</span>
+			<a href="#">招聘人才</a>
+			<span>|</span>
+			<a href="#">友情链接</a>		
+		</div>
+		<p>CopyRight © 2016 北京天天生鲜信息技术有限公司 All Rights Reserved</p>
+		<p>电话：010-****888    京ICP备*******8号</p>
+	</div>
+<script type="text/javascript" src="/static/js/jquery-1.12.4.min.js"></script>
+<script type='text/javascript'>
+		$(function(){
+		if($('.login_btn').text().indexOf('登录')<0){
+			$.get('/cart',function(data){
+				$('.goods_count').text(data.count);
+			});
+
+		}
+
+		})
+	</script>
+<script type=text/javascript>
+	$(function(){
+		var v1=$('.sort_bar').attr('value');
+		var v2=Number(v1)-1;
+	   $('.sort_bar').children().eq(v2).addClass('active').siblings().removeClass('active');
+
+
+
+
+	});
+
+	$(function(){
+		var v1=$('.pagenation').attr('value1');
+		var v2=Number($('.pagenation').attr('value2'));
+		var num=Number($('.pagenation').attr('num'));
+		var p_up ;
+		var p_down ;
+		$('.pagenation').children().eq(v2).addClass('active');
+
+		if(1<v2<num){
+			p_up=v2-1;
+			p_down=v2+1;
+		}
+		if(v2==1){
+			p_up=v2;
+			p_down=v2+1;
+		}
+		if(v2==num){
+			p_up=v2-1;
+			p_down=v2;
+			}
+		console.log(p_up,p_down);
+		p_up=v1+String(p_up);
+		p_down=v1+String(p_down);
+		$('.p_up').attr('href',p_up);
+		$('.p_down').attr('href',p_down);
+
+
+	})
+	
+</script>
+	
+</body>
+</html>
+{%endblock body%}
